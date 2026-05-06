@@ -72,4 +72,17 @@ class RoverSystemParserTest {
         assertTrue(output.contains("1 4 NACTIVE"));
         assertTrue(output.contains("0 0 SLOST"));
     }
+    @Test
+    void shouldNotTeriminateIfFoundINvalidCmd() {
+        RoverSystemScanner scanner = RoverSystemScanner.from("""
+            5 5
+            R1 1 2 N
+            R1: kFFkk
+            """);
+        RoverSystemParser parser = new RoverSystemParser(scanner, Navigator.create(), new CommandCreator());
+
+        RoverSystem roverSystem = parser.parse();
+        roverSystem.execute();
+
+    }
 }

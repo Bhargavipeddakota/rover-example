@@ -3,6 +3,7 @@ package com.tw.step.rover.roversystem;
 import com.tw.step.rover.boundary.Boundary;
 import com.tw.step.rover.boundary.Plateau;
 import com.tw.step.rover.commands.CommandCreator;
+import com.tw.step.rover.commands.CommandNotFoundException;
 import com.tw.step.rover.commands.RoverCommands;
 import com.tw.step.rover.position.Coordinate;
 import com.tw.step.rover.position.Direction;
@@ -60,7 +61,12 @@ public class RoverSystemParser {
             String instructions = scanner.consume();
             RoverCommands commands = new RoverCommands();
             for (char c : instructions.toCharArray()) {
-                commands.add(commandCreator.create(c, navigator, boundary));
+                try {
+                    commands.add(commandCreator.create(c, navigator, boundary));
+                }
+                catch (CommandNotFoundException e){
+                    System.out.println(e.toString());
+                }
             }
              commandMap.put(roverId,commands);
         }
