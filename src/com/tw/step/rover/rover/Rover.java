@@ -65,7 +65,8 @@ public class Rover {
         this.status = RoverStatus.LOST;
     }
 
-    public RoverStatus getStatus() {
-        return status;
+
+    public String getId() {
+        return id;
     }
 }

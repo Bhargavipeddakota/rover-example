@@ -3,12 +3,13 @@ package com.tw.step.rover.roversystem;
 import com.tw.step.rover.boundary.Boundary;
 import com.tw.step.rover.boundary.Plateau;
 import com.tw.step.rover.commands.CommandCreator;
-import com.tw.step.rover.commands.RoverCommand;
 import com.tw.step.rover.commands.RoverCommands;
 import com.tw.step.rover.position.Coordinate;
 import com.tw.step.rover.position.Direction;
 import com.tw.step.rover.position.Navigator;
 import com.tw.step.rover.rover.Rover;
+
+import java.util.*;
 
 public class RoverSystemParser {
     private final RoverSystemScanner scanner;
@@ -22,18 +23,26 @@ public class RoverSystemParser {
 //        this.boundary = boundary;
         this.commandCreator = commandCreator;
     }
-    private Rover parseRover() {
-        Coordinate coordinate = scanner.scanCoordinate();
-        Direction heading = scanner.scanDirection();
-        return new Rover(coordinate, heading);
+    private List<Rover> parseRovers() {
+        List<Rover> rovers = new ArrayList<>();
+        while (scanner.hasNext() && !scanner.peek().contains(":")){
+            String id = scanner.consume();
+            Coordinate coordinate = scanner.scanCoordinate();
+            Direction heading = scanner.scanDirection();
+            rovers.add(new Rover(id,coordinate, heading));
+        }
+
+        return rovers;
+
     }
+
 
     public RoverSystem parse() {
         Boundary boundary = parseBoundary();
         RoverSystem roverSystem = new RoverSystem();
-        Rover rover = parseRover();
-        roverSystem.addRover(rover);
-        RoverCommands roverCommands = parseRoverCommands(boundary);
+        List<Rover> rovers = parseRovers();
+        roverSystem.addRover(rovers);
+        Map<String, RoverCommands> roverCommands = parseRoverCommands(boundary);
         roverSystem.addCommands(roverCommands);
         return roverSystem;
     }
@@ -44,14 +53,17 @@ public class RoverSystemParser {
     }
 
 
-    private RoverCommands parseRoverCommands(Boundary boundary) {
-        RoverCommands roverCommands = new RoverCommands();
-        String instructions = scanner.consume();
-        for (int i = 0; i < instructions.length(); i++) {
-            RoverCommand roverCommand = commandCreator.create(instructions.charAt(i), navigator, boundary);
-            roverCommands.add(roverCommand);
+    private Map<String, RoverCommands> parseRoverCommands(Boundary boundary) {
+        Map<String, RoverCommands> commandMap = new HashMap<>();
+        while(scanner.hasNext()){
+            String roverId = scanner.consume().replace(":","");
+            String instructions = scanner.consume();
+            RoverCommands commands = new RoverCommands();
+            for (char c : instructions.toCharArray()) {
+                commands.add(commandCreator.create(c, navigator, boundary));
+            }
+             commandMap.put(roverId,commands);
         }
-
-        return roverCommands;
+        return commandMap;
     }
 }

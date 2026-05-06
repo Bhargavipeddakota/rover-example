@@ -6,20 +6,70 @@ import com.tw.step.rover.position.Navigator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RoverSystemParserTest {
     @Test
     void shouldParseAndExecuteRoverSystem() {
         RoverSystemScanner scanner = RoverSystemScanner.from("""
-                5 5 
-                1 2 N
-                RFF
-                """);
+            5 5
+            R1 1 2 N
+            R1: RFF
+            """);
         RoverSystemParser parser = new RoverSystemParser(scanner, Navigator.create(), new CommandCreator());
 
         RoverSystem roverSystem = parser.parse();
         roverSystem.execute();
 
         assertEquals("3 2 EACTIVE", roverSystem.toString());
+    }
+
+    @Test
+    void shouldExecuteCommandsForMultipleRovers() {
+        String input = """
+        5 5
+        R1 1 2 N
+        R2 3 3 E
+        R1: F
+        R2: F
+        """;
+
+        RoverSystemScanner scanner = RoverSystemScanner.from(input);
+        RoverSystemParser parser =
+                new RoverSystemParser(scanner,Navigator.create(),new CommandCreator());
+
+        RoverSystem system = parser.parse();
+        system.execute();
+
+        String output = system.toString();
+
+//        assertEquals("1 3 NACTIVE", system.toString());
+//        assertEquals("4 3 EACTIVE", system.toString());
+        assertTrue(output.contains("1 3 NACTIVE"));
+        assertTrue(output.contains("4 3 E"));
+    }
+    @Test
+    void shouldHaveOneRoverActiveAndOneLost() {
+
+        String input = """
+        5 5
+        R1 1 2 N
+        R2 0 0 S
+        R1: FF
+        R2: F
+        """;
+
+        RoverSystemScanner scanner = RoverSystemScanner.from(input);
+
+        RoverSystemParser parser =
+                new RoverSystemParser(scanner,Navigator.create() ,new CommandCreator());
+
+        RoverSystem system = parser.parse();
+        system.execute();
+
+        String output = system.toString();
+
+        assertTrue(output.contains("1 4 NACTIVE"));
+        assertTrue(output.contains("0 0 SLOST"));
     }
 }
