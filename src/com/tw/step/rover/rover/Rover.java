@@ -10,6 +10,7 @@ public class Rover {
     private RoverState roverState;
     private Coordinate coordinate;
     private Direction heading;
+    private RoverStatus status = RoverStatus.ACTIVE;
 
     public Rover(String id, Coordinate coordinate, Direction heading) {
         this.id = id;
@@ -39,6 +40,7 @@ public class Rover {
     }
 
     void turnRightInternal(Navigator navigator) {
+
         this.heading = navigator.rightOf(this.heading);
     }
 
@@ -56,6 +58,14 @@ public class Rover {
 
     @Override
     public String toString() {
-        return coordinate.toString() + " " + heading.toString();
+        return coordinate.toString() + " " + heading.toString() + status;
+    }
+
+    public void markLost() {
+        this.status = RoverStatus.LOST;
+    }
+
+    public RoverStatus getStatus() {
+        return status;
     }
 }

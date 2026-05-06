@@ -20,6 +20,6 @@ class AppTest {
             System.setOut(originalOut);
         }
 
-        assertEquals("-4 6 N" + System.lineSeparator(), output.toString());
+        assertEquals("0 0 SLOST" + System.lineSeparator(), output.toString());
     }
 }

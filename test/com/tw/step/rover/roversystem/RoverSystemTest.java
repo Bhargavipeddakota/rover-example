@@ -23,6 +23,6 @@ class RoverSystemTest {
         roverSystem.addCommands(commands);
         roverSystem.execute();
 
-        assertEquals("0 1 N", roverSystem.toString());
+        assertEquals("0 1 NACTIVE", roverSystem.toString());
     }
 }
